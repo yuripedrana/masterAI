@@ -16,7 +16,7 @@ class Utente:
         self.id_utente = id_utente
 
     def __str__(self):
-        return f"Utente: {self.nome}, Età: {self.eta}, ID: {self.id_utente}"
+        return f"{self.nome}, Età: {self.eta}, ID: {self.id_utente}"
     
 class Prestito:
     def __init__(self, utente, libro, giorni):
@@ -24,8 +24,9 @@ class Prestito:
             self.libro = libro
             self.giorni = giorni
 
+
     def __str__(self):
-        return (f"Prestito:\n"
+        return (
                 f"Utente: {self.utente}\n"
                 f"Libro: {self.libro}\n"
                 f"Giorni: {self.giorni}")
@@ -53,7 +54,7 @@ utenti = [
 ]
 prestiti = []
 
-prestiti.append(Presta_Libro(utenti[2], libri[4], 14))
+prestiti.append(Presta_Libro(utenti[1], libri[4], 14))
 
 print("ELENCO LIBRI DISPONIBILI:")
 for libro in libri:
