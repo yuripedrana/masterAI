@@ -1,66 +1,46 @@
-titolo = str(input("Inserisci il titolo del libro: "))
-numero_copie = int(input("Inserisci il numero di copie: "))
-prezzo_medio_libro = float(input("Inserisci il prezzo medio del libro: "))
-stato_disponibilita = bool(int(input("Inserisci lo stato di disponibilità (1 per disponibile, 0 per non disponibile): ")))
+import pandas as pd
+import numpy as np
 
-print("Titolo:", titolo, "Numero copie:", numero_copie, "Prezzo medio:", prezzo_medio_libro, "Disponibilità:", stato_disponibilita)
+dataset = {
+    "Data_Vendita": ["2024-01-01", "2024-02-15", "2024-03-10", "2024-04-05", "2024-05-01"],
+    "Prodotto": ["La ptop", "Gonn a", "Ane llo", "Trucc o", "T rucco"],
+    "Vendite": [5, 10, None, 8, None],
+    "Prezzo": [1000, 50, 200, 300, 300],
+}
 
-titoli_libri = ["Divina Commedia", "Il Nome della Rosa", "I Promessi Sposi", "La coscienza di Zeno", "Il Gattopardo"]
+df = pd.DataFrame(dataset)
 
-titoli_copie = {titolo: numero_copie for titolo in titoli_libri}
+prime_righe = df.head()
+print(prime_righe)
 
-print("Titoli e copie:", titoli_copie)
+struttura_df = df.info()
+print(struttura_df)
 
-utenti_registrati = set({})
+statistiche_descrittive = df.describe()
+print(statistiche_descrittive)
 
-prestiti = []
+# Pulizia dei dati
+df["Data_Vendita"] = pd.to_datetime(df["Data_Vendita"], errors='coerce')
+df["Prodotto"] = df["Prodotto"].map(lambda x: x.strip().replace(" ", "").capitalize() if pd.notnull(x) else x)
+df["Vendite"] = df["Vendite"].fillna(0)
+df["Prezzo"] = df["Prezzo"].fillna(0)
 
-class Libro:
-    def __init__(self, titolo, autore, anno, copie_disponibili):
-        self.titolo = titolo
-        self.autore = autore
-        self.anno = anno
-        self.copie_disponibili = copie_disponibili
+# Rimozione delle righe duplicate
+df = df.drop_duplicates()
 
-    def info(self):
-        return f"Titolo: {self.titolo}, Autore: {self.autore}, Anno: {self.anno}, Copie disponibili: {self.copie_disponibili}"
+# Verifica dei dati puliti
+print(df)
 
+vendite_totale_per_prodotto = df.groupby("Prodotto")["Vendite"].sum()
+print(vendite_totale_per_prodotto)
 
-class Utente:
-    def __init__(self, nome, eta, id_utente):
-        self.nome = nome
-        self.eta = eta
-        self.id_utente = id_utente
+prodotto_piu_venduto = vendite_totale_per_prodotto.idxmax()
+print(prodotto_piu_venduto)
 
-    def scheda(self):
-        return f"Nome: {self.nome}, Età: {self.eta}, ID Utente: {self.id_utente}"
+prodotto_meno_venduto = vendite_totale_per_prodotto.idxmin()
+print(prodotto_meno_venduto)
 
-class Prestito:
-    def __init__(self, utente=None, libro=None, giorni_prestito=None):
-        self.utente = utente
-        self.libro = libro
-        self.giorni_prestito = giorni_prestito
-
-    def dettagli_prestito(self):
-        return f"Utente: {self.utente.scheda()}, Libro: {self.libro.info()}, Giorni prestito: {self.giorni_prestito}"
-
-def presta_libro(utente, libro, giorni):
-        if libro.copie_disponibili > 0:
-            libro.copie_disponibili -= 1
-            titoli_copie[libro.titolo] -= 1
-            nuovo_prestito = Prestito(utente, libro, giorni)
-            utenti_registrati.add((utente.nome, utente.id_utente))
-            prestiti.append(nuovo_prestito)
-            return nuovo_prestito
-            return 
-        else:
-            raise ValueError("Libro non disponibile")
+vendite_giornaliere = df.groupby("Data_Vendita")["Vendite"].sum()
+print(vendite_giornaliere)
 
 
-prestito1 = presta_libro(Utente("Mario Rossi", 30, 1), Libro("Divina Commedia", "Dante Alighieri", 1320, 1), 7)
-prestito2 = presta_libro(Utente("Luigi Bianchi", 25, 2), Libro("Il Nome della Rosa", "Umberto Eco", 1980, 5), 14)
-prestito3 = presta_libro(Utente("Giovanni Verdi", 40, 3), Libro("I Promessi Sposi", "Alessandro Manzoni", 1840, 10), 10)
-prestito4 = presta_libro(Utente("Maria Neri", 40, 3), Libro("I Promessi Sposi", "Alessandro Manzoni", 1840, 8), 10)
-print("Utenti registrati:", utenti_registrati)
-print("Titoli e copie:", titoli_copie)
-print("Prestiti:", [p.dettagli_prestito() for p in prestiti])
